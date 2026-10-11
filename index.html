@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>跳转星核APP</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui, sans-serif;}
+        body{background:#0f2447;color:#fff;text-align:center;padding:40px 20px;}
+        .mask{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:999;padding:30px;}
+        .mask-box{background:#fff;border-radius:16px;padding:30px;color:#222;}
+        .btn{display:block;width:100%;background:#2563eb;color:#fff;border:none;padding:16px;border-radius:12px;font-size:18px;margin-top:20px;}
+        .tip{margin-top:20px;color:#666;font-size:14px;line-height:1.6;}
+    </style>
+</head>
+<body>
+    <h2>正在尝试打开星核APP</h2>
+    <p style="margin-top:16px;opacity:0.8">如未自动跳转，请点击下方按钮</p >
+    <button class="btn" id="openAppBtn">打开星核APP</button>
+
+    <!-- 微信环境遮罩：微信内置浏览器打开时，提示复制链接到外部浏览器 -->
+    <div class="mask" id="wechatMask">
+        <div class="mask-box">
+            <h3>微信内无法直接唤起APP</h3>
+            <p class="tip">点击右上角【···】，选择【复制链接】，粘贴到手机浏览器打开</p >
+            <button class="btn" id="copyBtn">复制网页链接</button>
+        </div>
+    </div>
+
+    <script>
+        // ========== 这里修改你的星核私有协议，替换成你的星核邀请私有链接 ==========
+        const appSchema = "https://web.xinghechat.com/web/user_share.html?content=eyJpbnZpdGVVc2VySWQiOiI1NjQ1NzciLCJpbnZpdGVDb2RlIjoiMFBGWUcwQkkiLCJ0eXBlIjoiMSIsInRhcmdldElkIjoiNTY0NTc3In0=";
+        // 你的原始星核分享网页链接（APP未安装时跳转）
+        const downloadUrl = "https://web.xinghechat.com/web/user_share.html?content=eyJpbnZpdGVVc2VySWQiOiI1NjQ1NzciLCJpbnZpdGVDb2RlIjoiMFBGWUcwQkkiLCJ0eXBlIjoiMSIsInRhcmdldElkIjoiNTY0NTc3In0=";
+
+        // 判断是否微信浏览器
+        function isWeChat() {
+            return navigator.userAgent.toLowerCase().indexOf('micromessenger') !== -1;
+        }
+
+        // 复制链接函数
+        async function copyUrl() {
+            try{
+                await navigator.clipboard.writeText(downloadUrl);
+                alert("链接复制成功！打开手机浏览器粘贴访问");
+            }catch(e){
+                alert("复制失败，请手动复制链接：" + downloadUrl);
+            }
+        }
+
+        // 唤起APP
+        function openApp() {
+            window.location.href = appSchema;
+            // 延时判断：如果没打开APP，跳转到下载页面
+            setTimeout(function(){
+                window.location.href = downloadUrl;
+            }, 1200);
+        }
+
+        window.onload = function() {
+            if(isWeChat()){
+                // 微信内：弹出遮罩，不尝试唤起APP
+                document.getElementById('wechatMask').style.display = "block";
+                document.getElementById('copyBtn').onclick = copyUrl;
+            }else{
+                // 外部浏览器：自动尝试唤起APP
+                openApp();
+                document.getElementById('openAppBtn').onclick = openApp;
+            }
+        }
+    </script>
+</body>
+</html>
